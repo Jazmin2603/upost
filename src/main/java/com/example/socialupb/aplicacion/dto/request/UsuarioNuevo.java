@@ -1,4 +1,4 @@
-package com.example.socialupb.aplicacion.dto;
+package com.example.socialupb.aplicacion.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
