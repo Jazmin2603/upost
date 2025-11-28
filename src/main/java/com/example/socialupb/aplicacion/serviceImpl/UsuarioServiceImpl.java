@@ -4,6 +4,7 @@ import com.example.socialupb.aplicacion.dto.request.UsuarioNuevo;
 import com.example.socialupb.aplicacion.dto.response.UsuarioResponse;
 import com.example.socialupb.aplicacion.service.UsuarioService;
 import com.example.socialupb.dominio.exception.OperationException;
+import com.example.socialupb.dominio.modelo.Usuario;
 import com.example.socialupb.infraestructura.entity.UsuarioEntity;
 import com.example.socialupb.infraestructura.repository.UsuarioRepository;
 import lombok.*;
@@ -41,13 +42,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public void save(UsuarioNuevo usuarioDto) {
-        UsuarioEntity usuarioEntity = UsuarioEntity.builder()
-                .nombre(usuarioDto.getNombre())
-                .email(usuarioDto.getEmail())
-                .password(passwordEncoder.encode(usuarioDto.getPassword()))
-                .build();
+        Usuario usuario = new Usuario(usuarioDto.getNombre(),usuarioDto.getEmail(),usuarioDto.getPassword());
 
-        usuarioRepository.save(usuarioEntity);
+        usuarioRepository.save(UsuarioEntity.builder()
+                .nombre(usuario.getNombre())
+                .email(usuario.getEmail())
+                .password(passwordEncoder.encode(usuario.getPassword()))
+                .build());
     }
     @Override
     @Transactional
