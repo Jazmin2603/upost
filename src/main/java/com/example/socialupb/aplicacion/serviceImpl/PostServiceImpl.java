@@ -3,6 +3,7 @@ package com.example.socialupb.aplicacion.serviceImpl;
 import com.example.socialupb.aplicacion.dto.request.PostNuevo;
 import com.example.socialupb.aplicacion.dto.request.UsuarioNuevo;
 import com.example.socialupb.aplicacion.dto.response.PostResponse;
+import com.example.socialupb.aplicacion.service.ComentarioService;
 import com.example.socialupb.aplicacion.service.PostService;
 import com.example.socialupb.aplicacion.service.UsuarioService;
 import com.example.socialupb.dominio.exception.OperationException;
@@ -36,6 +37,10 @@ public class PostServiceImpl implements PostService {
     @Lazy
     private UsuarioService usuarioService;
 
+    @Autowired
+    @Lazy
+    private ComentarioService comentarioService;
+
     @Override
     public PostEntity findById(Long id) {
         return postRepository.findById(id)
@@ -60,7 +65,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void delete(Long id) {
         PostEntity post = findById(id);
-        //Borrar todos los comentarios asociados
+        comentarioService.borrarPorPost(id);
         postRepository.delete(post);
     }
 

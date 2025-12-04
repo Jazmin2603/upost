@@ -1,5 +1,6 @@
 package com.example.socialupb.aplicacion.serviceImpl;
 
+import com.example.socialupb.aplicacion.dto.request.ComentarioNuevo;
 import com.example.socialupb.aplicacion.dto.request.PostNuevo;
 import com.example.socialupb.aplicacion.dto.response.PostResponse;
 import com.example.socialupb.aplicacion.service.ComentarioService;
@@ -51,12 +52,12 @@ public class ComentarioServiceImpl implements ComentarioService {
     }
 
     @Override
-    public void save(PostNuevo postDto) {
-        UsuarioEntity usuario = usuarioService.findById(postDto.getId());
-        PostEntity post = postService.findById(postDto.getId());
+    public void save(ComentarioNuevo comentarioDto) {
+        UsuarioEntity usuario = usuarioService.findById(comentarioDto.getId());
+        PostEntity post = postService.findById(comentarioDto.getId());
 
         comentarioRepository.save(ComentarioEntity.builder()
-                .mensaje(postDto.getMensaje())
+                .mensaje(comentarioDto.getMensaje())
                 .fecha(LocalDateTime.now())
                 .usuarioEntity(usuario)
                 .postEntity(post)
@@ -67,6 +68,12 @@ public class ComentarioServiceImpl implements ComentarioService {
     public void delete(Long id) {
         ComentarioEntity comentario = findById(id);
         comentarioRepository.delete(comentario);
+    }
+
+    @Override
+    @Transactional
+    public void borrarPorPost(Long idPost) {
+        comentarioRepository.eliminarComentariosPorPost(idPost);
     }
 
 }

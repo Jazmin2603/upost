@@ -25,6 +25,9 @@ public class PostEntity {
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
 
+    @Column(name = "url_imagen", length = 300)
+    private String imagenUrl;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario")
