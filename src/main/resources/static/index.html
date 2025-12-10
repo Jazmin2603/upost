@@ -4,7 +4,259 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPost - Iniciar Sesión</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root {
+            --color-50: #E6F1FF;
+            --color-100: #B8D7FF;
+            --color-200: #8ABDFF;
+            --color-300: #5CA3FF;
+            --color-400: #4294FF;
+            --color-500: #006FFF;
+            --color-600: #005BD1;
+            --color-700: #0047A3;
+            --color-800: #003375;
+            --color-900: #001F47;
+            --color-950: #000B1A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--color-500) 0%, var(--color-700) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-20px) translateX(20px); }
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--color-500) 0%, var(--color-600) 100%);
+            padding: 50px 40px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--color-500);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-header h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+        }
+
+        .login-form {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-800);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-400);
+            font-size: 18px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid var(--color-100);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: var(--color-50);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-500);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 111, 255, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-500) 0%, var(--color-600) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 111, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 111, 255, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--color-700);
+        }
+
+        .register-link a {
+            color: var(--color-500);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: var(--color-600);
+            text-decoration: underline;
+        }
+
+        .error {
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border-left: 4px solid #DC2626;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
 <div class="login-container">
@@ -21,7 +273,7 @@
             <div class="form-group">
                 <label for="email">Correo electrónico</label>
                 <div class="input-wrapper">
-                    <span class="input-icon"></span>
+                    <span class="input-icon">📧</span>
                     <input type="email" id="email" placeholder="tu@email.com" required>
                 </div>
             </div>
@@ -29,20 +281,12 @@
             <div class="form-group">
                 <label for="password">Contraseña</label>
                 <div class="input-wrapper">
-                    <span class="input-icon"></span>
+                    <span class="input-icon">🔒</span>
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
             </div>
 
-            <div class="remember-forgot">
-                <label class="remember">
-                    <input type="checkbox" id="remember">
-                    <span>Recuérdame</span>
-                </label>
-                <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            <button type="submit" class="btn btn-primary" id="loginBtn">Iniciar Sesión</button>
         </form>
 
         <div class="register-link">
@@ -52,52 +296,59 @@
 </div>
 
 <script>
-    function initData() {
-        const users = JSON.parse(localStorage.getItem('upost_users') || '[]');
+    const API_BASE_URL = 'http://localhost:8080/api/v1';
 
-        if (users.length === 0) {
-            const defaultUsers = [
-                { codigo: 1, nombre: 'Juan Pérez', email: 'juan@email.com', password: '123456' },
-                { codigo: 2, nombre: 'María García', email: 'maria@email.com', password: '123456' }
-            ];
-            localStorage.setItem('upost_users', JSON.stringify(defaultUsers));
-        }
-
-        if (!localStorage.getItem('upost_posts')) {
-            localStorage.setItem('upost_posts', '[]');
-        }
-        if (!localStorage.getItem('upost_comments')) {
-            localStorage.setItem('upost_comments', '[]');
-        }
-        if (!localStorage.getItem('upost_likes')) {
-            localStorage.setItem('upost_likes', '[]');
-        }
-    }
-
-    function handleLogin(event) {
+    async function handleLogin(event) {
         event.preventDefault();
 
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const errorDiv = document.getElementById('errorMessage');
+        const loginBtn = document.getElementById('loginBtn');
 
-        const users = JSON.parse(localStorage.getItem('upost_users') || '[]');
-        const user = users.find(u => u.email === email && u.password === password);
+        errorDiv.classList.remove('show');
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="loading"></span>';
 
-        if (user) {
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            window.location.href = 'feed.html';
-        } else {
-            errorDiv.textContent = '❌ Email o contraseña incorrectos';
+        try {
+            // Obtener todos los usuarios
+            const response = await fetch(`${API_BASE_URL}/usuarios?size=1000`);
+
+            if (!response.ok) {
+                throw new Error('Error al conectar con el servidor');
+            }
+
+            const data = await response.json();
+            const users = data.content || [];
+
+            // Buscar usuario por email (el password está encriptado en el backend,
+            // así que por ahora solo validamos el email)
+            const user = users.find(u => u.email === email);
+
+            if (user) {
+                // Guardar usuario en localStorage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: user.id,
+                    nombre: user.nombre,
+                    email: user.email
+                }));
+
+                // Redirigir al feed
+                window.location.href = 'feed.html';
+            } else {
+                errorDiv.textContent = '❌ Usuario no encontrado';
+                errorDiv.classList.add('show');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Iniciar Sesión';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            errorDiv.textContent = '❌ Error al conectar con el servidor. Asegúrate de que el backend esté ejecutándose.';
             errorDiv.classList.add('show');
-
-            setTimeout(() => {
-                errorDiv.classList.remove('show');
-            }, 3000);
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Iniciar Sesión';
         }
     }
-
-    initData();
 
     // Auto-login si ya hay sesión
     const currentUser = localStorage.getItem('currentUser');

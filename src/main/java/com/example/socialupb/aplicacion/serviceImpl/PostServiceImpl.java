@@ -53,7 +53,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void save(PostNuevo postDto) {
-        UsuarioEntity usuario = usuarioService.findById(postDto.getId());
+        UsuarioEntity usuario = usuarioService.findById(postDto.getIdusuario());
 
         postRepository.save(PostEntity.builder()
                 .mensaje(postDto.getMensaje())

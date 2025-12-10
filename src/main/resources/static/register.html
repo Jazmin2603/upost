@@ -196,6 +196,12 @@
             transform: translateY(0);
         }
 
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .login-link {
             text-align: center;
             margin-top: 24px;
@@ -286,31 +292,18 @@
             background: #059669;
         }
 
-        .terms {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 24px;
-            font-size: 13px;
-            color: var(--color-700);
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
         }
 
-        .terms input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--color-500);
-            margin-top: 2px;
-            flex-shrink: 0;
-        }
-
-        .terms a {
-            color: var(--color-500);
-            text-decoration: none;
-        }
-
-        .terms a:hover {
-            text-decoration: underline;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -330,7 +323,7 @@
             <div class="form-group">
                 <label for="name">Nombre completo</label>
                 <div class="input-wrapper">
-                    <span class="input-icon"></span>
+                    <span class="input-icon">👤</span>
                     <input type="text" id="name" placeholder="Juan Pérez" required>
                 </div>
             </div>
@@ -338,15 +331,15 @@
             <div class="form-group">
                 <label for="email">Correo electrónico</label>
                 <div class="input-wrapper">
-                    <span class="input-icon"></span>
+                    <span class="input-icon">📧</span>
                     <input type="email" id="email" placeholder="tu@email.com" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="password">Contraseña</label>
+                <label for="password">Contraseña (mín. 8 caracteres, 1 mayúscula, 1 número)</label>
                 <div class="input-wrapper">
-                    <span class="input-icon"></span>
+                    <span class="input-icon">🔒</span>
                     <input type="password" id="password" placeholder="••••••••" required oninput="checkPasswordStrength()">
                 </div>
                 <div id="passwordStrength" class="password-strength">
@@ -357,21 +350,23 @@
             <div class="form-group">
                 <label for="confirmPassword">Confirmar contraseña</label>
                 <div class="input-wrapper">
-                    <span class="input-icon"></span>
+                    <span class="input-icon">🔐</span>
                     <input type="password" id="confirmPassword" placeholder="••••••••" required>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+            <button type="submit" class="btn btn-primary" id="registerBtn">Crear Cuenta</button>
         </form>
 
         <div class="login-link">
-            ¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a>
+            ¿Ya tienes una cuenta? <a href="index.html">Inicia sesión aquí</a>
         </div>
     </div>
 </div>
 
 <script>
+    const API_BASE_URL = 'http://localhost:8080/api/v1';
+
     function checkPasswordStrength() {
         const password = document.getElementById('password').value;
         const strengthDiv = document.getElementById('passwordStrength');
@@ -385,8 +380,8 @@
         strengthDiv.classList.add('show');
 
         let strength = 0;
-        if (password.length >= 6) strength++;
-        if (password.length >= 10) strength++;
+        if (password.length >= 8) strength++;
+        if (password.length >= 12) strength++;
         if (/[A-Z]/.test(password)) strength++;
         if (/[0-9]/.test(password)) strength++;
         if (/[^A-Za-z0-9]/.test(password)) strength++;
@@ -402,7 +397,7 @@
         }
     }
 
-    function handleRegister(event) {
+    async function handleRegister(event) {
         event.preventDefault();
 
         const name = document.getElementById('name').value.trim();
@@ -411,46 +406,73 @@
         const confirmPassword = document.getElementById('confirmPassword').value;
         const errorDiv = document.getElementById('errorMessage');
         const successDiv = document.getElementById('successMessage');
+        const registerBtn = document.getElementById('registerBtn');
 
         errorDiv.classList.remove('show');
         successDiv.classList.remove('show');
 
+        // Validaciones frontend
         if (password !== confirmPassword) {
             errorDiv.textContent = '❌ Las contraseñas no coinciden';
             errorDiv.classList.add('show');
             return;
         }
 
-        if (password.length < 6) {
-            errorDiv.textContent = '❌ La contraseña debe tener al menos 6 caracteres';
+        if (password.length < 8) {
+            errorDiv.textContent = '❌ La contraseña debe tener al menos 8 caracteres';
             errorDiv.classList.add('show');
             return;
         }
 
-        const users = JSON.parse(localStorage.getItem('upost_users') || '[]');
-
-        if (users.find(u => u.email === email)) {
-            errorDiv.textContent = '❌ Este email ya está registrado';
+        if (!/[A-Z]/.test(password)) {
+            errorDiv.textContent = '❌ La contraseña debe contener al menos una mayúscula';
             errorDiv.classList.add('show');
             return;
         }
 
-        const newUser = {
-            codigo: users.length > 0 ? Math.max(...users.map(u => u.codigo)) + 1 : 1,
-            nombre: name,
-            email: email,
-            password: password
-        };
+        if (!/[0-9]/.test(password)) {
+            errorDiv.textContent = '❌ La contraseña debe contener al menos un número';
+            errorDiv.classList.add('show');
+            return;
+        }
 
-        users.push(newUser);
-        localStorage.setItem('upost_users', JSON.stringify(users));
+        registerBtn.disabled = true;
+        registerBtn.innerHTML = '<span class="loading"></span>';
 
-        successDiv.textContent = '✅ Cuenta creada exitosamente. Redirigiendo...';
-        successDiv.classList.add('show');
+        try {
+            const response = await fetch(`${API_BASE_URL}/usuarios`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nombre: name,
+                    email: email,
+                    password: password
+                })
+            });
 
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 1500);
+            if (response.ok) {
+                successDiv.textContent = '✅ Cuenta creada exitosamente. Redirigiendo...';
+                successDiv.classList.add('show');
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                const error = await response.json();
+                errorDiv.textContent = `❌ ${error.mensaje || 'Error al crear la cuenta. El email podría estar en uso.'}`;
+                errorDiv.classList.add('show');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Crear Cuenta';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            errorDiv.textContent = '❌ Error al conectar con el servidor. Asegúrate de que el backend esté ejecutándose.';
+            errorDiv.classList.add('show');
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'Crear Cuenta';
+        }
     }
 </script>
 </body>

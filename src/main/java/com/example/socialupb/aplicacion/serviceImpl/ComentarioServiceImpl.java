@@ -53,8 +53,8 @@ public class ComentarioServiceImpl implements ComentarioService {
 
     @Override
     public void save(ComentarioNuevo comentarioDto) {
-        UsuarioEntity usuario = usuarioService.findById(comentarioDto.getId());
-        PostEntity post = postService.findById(comentarioDto.getId());
+        UsuarioEntity usuario = usuarioService.findById(comentarioDto.getIdusuario());
+        PostEntity post = postService.findById(comentarioDto.getIdPost());
 
         comentarioRepository.save(ComentarioEntity.builder()
                 .mensaje(comentarioDto.getMensaje())
