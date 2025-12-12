@@ -2,6 +2,7 @@ package com.example.socialupb.aplicacion.serviceImpl;
 
 import com.example.socialupb.aplicacion.dto.request.ComentarioNuevo;
 import com.example.socialupb.aplicacion.dto.request.PostNuevo;
+import com.example.socialupb.aplicacion.dto.response.ComentarioResponse;
 import com.example.socialupb.aplicacion.dto.response.PostResponse;
 import com.example.socialupb.aplicacion.service.ComentarioService;
 import com.example.socialupb.aplicacion.service.PostService;
@@ -47,7 +48,7 @@ public class ComentarioServiceImpl implements ComentarioService {
                 .orElseThrow(() -> new OperationException("Comentario no encontrado: " + id));
     }
     @Override
-    public Page<PostResponse> listarPorPost(Long idPost,Pageable pageable) {
+    public Page<ComentarioResponse> listarPorPost(Long idPost, Pageable pageable) {
         return comentarioRepository.listarPorPost(idPost,pageable);
     }
 

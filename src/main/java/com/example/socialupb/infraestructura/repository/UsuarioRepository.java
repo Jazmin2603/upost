@@ -6,9 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
     @Query("SELECT new com.example.socialupb.aplicacion.dto.response.UsuarioResponse (u)" +
             " from UsuarioEntity u")
     Page<UsuarioResponse> listAll(Pageable pageable);
+
+    Optional<UsuarioEntity> findByEmail(@Param("pEmail") String email);
 }

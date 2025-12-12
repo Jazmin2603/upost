@@ -4,12 +4,14 @@ import com.example.socialupb.infraestructura.entity.UsuarioEntity;
 import com.example.socialupb.infraestructura.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 
 @Component
 @RequiredArgsConstructor
+@DependsOn("entityManagerFactory")
 public class DataInitializer implements CommandLineRunner {
     private final UsuarioRepository UsuarioRepository;
     private final PasswordEncoder passwordEncoder;

@@ -7,7 +7,9 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class PostNuevo {
+public class CompartirDto {
+    private String emailUsuario;
+    private String password;
     private String mensaje;
-    private Long idusuario;
+
 }

@@ -34,7 +34,7 @@ public class LikeController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<?> eliminarUsuario(@RequestParam("idUsuario") Long idUsuario, @RequestParam("idPost") Long idPost) {
+    public ResponseEntity<?> eliminarLike(@RequestParam("idUsuario") Long idUsuario, @RequestParam("idPost") Long idPost) {
         try {
             likeService.delete(idUsuario, idPost);
             return ResponseEntity.ok("Like eliminado");

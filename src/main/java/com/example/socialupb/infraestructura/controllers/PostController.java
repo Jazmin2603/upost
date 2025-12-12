@@ -1,5 +1,6 @@
 package com.example.socialupb.infraestructura.controllers;
 
+import com.example.socialupb.aplicacion.dto.request.CompartirDto;
 import com.example.socialupb.aplicacion.dto.request.PostNuevo;
 import com.example.socialupb.aplicacion.dto.request.UsuarioNuevo;
 import com.example.socialupb.aplicacion.dto.response.ComentarioResponse;
@@ -7,14 +8,17 @@ import com.example.socialupb.aplicacion.dto.response.PostResponse;
 import com.example.socialupb.aplicacion.dto.response.UsuarioResponse;
 import com.example.socialupb.aplicacion.service.PostService;
 import com.example.socialupb.dominio.exception.OperationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -25,17 +29,24 @@ import java.util.Map;
 public class PostController {
     private final PostService postService;
 
-    @PostMapping()
-    public ResponseEntity<?> registrar(@RequestBody PostNuevo dto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registrar(
+            @RequestPart("dto") String dtoJson,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
         try {
-            postService.save(dto);
+            ObjectMapper mapper = new ObjectMapper();
+            PostNuevo dto = mapper.readValue(dtoJson, PostNuevo.class);
+
+            postService.save(dto, imagen);
             return ResponseEntity.ok("Registro OK");
-        }catch (OperationException oe) {
+        } catch (OperationException oe) {
             log.error(oe.getMessage());
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("mensaje", oe.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(Map.of("mensaje", oe.getMessage()));
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("Error al adicionar post");
+            return ResponseEntity.internalServerError()
+                    .body("Error al adicionar post");
         }
     }
 
@@ -68,6 +79,27 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("mensaje", oe.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+    @PostMapping(value = "/compartir", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> compartir(
+            @RequestPart("dto") String dtoJson,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
+        try {
+
+            ObjectMapper mapper = new ObjectMapper();
+            CompartirDto dto = mapper.readValue(dtoJson, CompartirDto.class);
+
+            postService.compartir(dto, imagen);
+            return ResponseEntity.ok(Map.of("mensaje", "Compartido exitoso"));
+        }catch (OperationException oe) {
+            log.error(oe.getMessage());
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("mensaje", oe.getMessage()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body("Error al compartir post");
         }
     }
 }

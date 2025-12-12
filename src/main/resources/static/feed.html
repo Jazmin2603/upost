@@ -581,6 +581,7 @@
     let users = [];
     let selectedColor = null;
     let allComments = {};
+    let allLikes = [];
 
     const PROFILE_COLORS = [
         '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
@@ -696,13 +697,17 @@
             console.log('Posts cargados:', posts.length);
 
             // Cargar comentarios para cada post
+            allComments = {};
             for (const post of posts) {
                 try {
                     const commentsResponse = await fetch(`${API_BASE_URL}/comentarios/${post.id}?size=100`);
                     if (commentsResponse.ok) {
                         const commentsData = await commentsResponse.json();
+                        console.log('Respuesta comentarios:', commentsData);
                         allComments[post.id] = commentsData.content || [];
+                        console.log(`Comentarios del post ${post.id}:`, allComments[post.id]);
                     } else {
+                        console.error(`Error HTTP al cargar comentarios: ${commentsResponse.status}`);
                         allComments[post.id] = [];
                     }
                 } catch (e) {
@@ -770,9 +775,54 @@
         }
     }
 
+    async function toggleLike(postId) {
+        try {
+            // Verificar si ya existe el like
+            const existingLike = allLikes.find(l =>
+                l.idPost === postId && l.idUsuario === currentUser.id
+            );
+
+            if (existingLike) {
+                // Eliminar like
+                const response = await fetch(
+                    `${API_BASE_URL}/likes?idUsuario=${currentUser.id}&idPost=${postId}`,
+                    { method: 'DELETE' }
+                );
+
+                if (response.ok) {
+                    allLikes = allLikes.filter(l =>
+                        !(l.idPost === postId && l.idUsuario === currentUser.id)
+                    );
+                    renderPosts();
+                }
+            } else {
+                // Agregar like
+                const response = await fetch(`${API_BASE_URL}/likes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idusuario: currentUser.id,
+                        idPost: postId
+                    })
+                });
+
+                if (response.ok) {
+                    allLikes.push({
+                        idUsuario: currentUser.id,
+                        idPost: postId
+                    });
+                    renderPosts();
+                }
+            }
+        } catch (error) {
+            console.error('Error al dar like:', error);
+        }
+    }
+
     function toggleComments(postId) {
         const commentsSection = document.getElementById(`comments-${postId}`);
-        commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+        const isVisible = commentsSection.style.display !== 'none';
+        commentsSection.style.display = isVisible ? 'none' : 'block';
     }
 
     async function addComment(postId) {
@@ -799,9 +849,11 @@
                 await loadData();
             } else {
                 console.error('Error al comentar');
+                alert('Error al agregar el comentario');
             }
         } catch (error) {
             console.error('Error al comentar:', error);
+            alert('Error al conectar con el servidor');
         }
     }
 
@@ -838,6 +890,8 @@
         container.innerHTML = posts.map(post => {
             const author = users.find(u => u.id === post.idusuario);
             const postComments = allComments[post.id] || [];
+            const postLikes = allLikes.filter(l => l.idPost === post.id);
+            const isLiked = postLikes.some(l => l.idUsuario === currentUser.id);
             const authorInitials = author ? getInitials(author.nombre) : '?';
             const authorColor = getUserColor(post.idusuario);
 
@@ -854,28 +908,33 @@
                     </div>
                     <div class="post-content">${post.mensaje}</div>
                     <div class="post-actions">
+                        <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                            ❤️ ${postLikes.length}
+                        </button>
                         <button class="action-btn" onclick="toggleComments(${post.id})">
                             💬 ${postComments.length}
                         </button>
                     </div>
                     <div id="comments-${post.id}" class="comments-section" style="display: none;">
-                        ${postComments.map(comment => {
+                        ${postComments.length > 0 ? postComments.map(comment => {
                 const commentAuthor = users.find(u => u.id === comment.idusuario);
-                const commentInitials = commentAuthor ? getInitials(commentAuthor.nombreUsuario || commentAuthor.nombre) : '?';
+                const commentInitials = commentAuthor ? getInitials(commentAuthor.nombre) : '?';
                 const commentColor = getUserColor(comment.idusuario);
+                const commentName = comment.nombreUsuario || (commentAuthor ? commentAuthor.nombre : 'Usuario');
+
                 return `
                                 <div class="comment">
                                     <div class="comment-header">
                                         <div class="comment-avatar" style="background: linear-gradient(135deg, ${commentColor}, ${adjustColor(commentColor, -20)})">${commentInitials}</div>
-                                        <span class="comment-author">${comment.nombreUsuario || (commentAuthor ? commentAuthor.nombre : 'Usuario')}</span>
+                                        <span class="comment-author">${commentName}</span>
                                         <span class="comment-time">${formatTime(comment.fecha)}</span>
                                     </div>
                                     <div class="comment-content">${comment.mensaje}</div>
                                 </div>
                             `;
-            }).join('')}
+            }).join('') : '<p style="color: var(--color-400); font-size: 14px; margin-bottom: 12px;">No hay comentarios aún. ¡Sé el primero en comentar!</p>'}
                         <div class="comment-form">
-                            <input type="text" id="comment-input-${post.id}" placeholder="Escribe un comentario...">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Escribe un comentario..." onkeypress="if(event.key==='Enter') addComment(${post.id})">
                             <button class="btn btn-comment" onclick="addComment(${post.id})">Comentar</button>
                         </div>
                     </div>

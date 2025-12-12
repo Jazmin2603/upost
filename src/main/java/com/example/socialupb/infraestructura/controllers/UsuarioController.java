@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -89,6 +90,24 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of("mensaje", oe.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PatchMapping("/{idUsuario}/foto-perfil")
+    public ResponseEntity<?> actualizarFotoPerfil(
+            @PathVariable Long idUsuario,
+            @RequestParam("imagen") MultipartFile imagen) {
+        try {
+            usuarioService.actualizarFotoPerfil(idUsuario, imagen);
+            return ResponseEntity.ok("Foto de perfil actualizada");
+        } catch (OperationException oe) {
+            log.error(oe.getMessage());
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(Map.of("mensaje", oe.getMessage()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body("Error al actualizar la foto de perfil");
         }
     }
 }

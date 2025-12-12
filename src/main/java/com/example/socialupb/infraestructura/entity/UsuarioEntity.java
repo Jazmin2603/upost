@@ -24,4 +24,8 @@ public class UsuarioEntity {
 
     @Column(name = "password",columnDefinition = "TEXT", nullable = false)
     private String password;
+
+    @Column(name = "url_imagen", length = 300)
+    private String imagenUrl;
+
 }
