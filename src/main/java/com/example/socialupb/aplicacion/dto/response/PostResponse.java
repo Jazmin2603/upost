@@ -17,6 +17,7 @@ public class PostResponse {
     private LocalDateTime fecha;
     private Long idusuario;
     private String nombreUsuario;
+    private String urlImagen;
 
     public PostResponse(PostEntity postEntity, UsuarioEntity usuarioEntity) {
         this.id = postEntity.getId();
@@ -24,5 +25,6 @@ public class PostResponse {
         this.fecha = postEntity.getFecha();
         this.idusuario = usuarioEntity.getId();
         this.nombreUsuario = usuarioEntity.getNombre();
+        this.urlImagen = postEntity.getImagenUrl();
     }
 }
